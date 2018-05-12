@@ -6,7 +6,7 @@ Important Note: Currently the pluin generates x64 only AppImages that do not bun
 Features:
 * Uses ANT and can also export the build.xml script for the application.
 
-Binary Download:  <a href="readme_resources/ide.export.appimage_1.0.0.201805122053.jar" download>ide.export.appimage_1.0.0.201805122053.jar</a>
+Binary Download:  <a href="https://github.com/brotenet/ide.export.appimage/raw/master/readme_resources/ide.export.appimage_1.0.0.201805122053.jar" download>ide.export.appimage_1.0.0.201805122053.jar</a>
 
 Installation: Place the ide.export.appimage_...jar file in Eclipse plugins directory
 
