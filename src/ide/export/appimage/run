@@ -1,0 +1,5 @@
+#!/bin/bash
+
+BASE_DIR=${PWD}
+
+java -jar $BASE_DIR/bin/@PACKAGE_NAME@.jar "$@"
