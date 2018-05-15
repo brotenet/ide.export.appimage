@@ -197,6 +197,7 @@ public class ExportAppImageComposite extends Composite {
 								Environment.FileSystem.delete(build_file_path);
 							}else {
 								Environment.FileSystem.copy(build_file_path, txtTargetDir.getText().trim() + Session.FileSeparator() + "build.xml");
+								Environment.FileSystem.delete(build_file_path);
 							}
 							completed = true;
 							btnBuild.setText("Close");

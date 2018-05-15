@@ -86,5 +86,6 @@
 		<delete file="application.png" />
 		<delete file="AppRun-x86_64" />
 		<delete file=".Diricon" />
+		<delete file="MANIFEST.MF" />
 	</target>
 </project>
