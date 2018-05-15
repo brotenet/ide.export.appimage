@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Terminal=false
+Name=@PACKAGE_NAME@
+Icon=@PACKAGE_NAME@
+GenericName=@PACKAGE_NAME@
+Comment=@PACKAGE_NAME@
+Exec=run

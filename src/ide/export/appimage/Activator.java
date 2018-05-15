@@ -21,6 +21,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.environment.Environment;
 import org.eclipse.swt.environment.WindowManager;
+import org.eclipse.swt.environment.Environment.Session;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -47,12 +48,12 @@ public class Activator extends AbstractUIPlugin {
 			
 		// The plugin directory path in the workspace
 		public static final String PLUGIN_WORKSPACE_DIR = WORKSPACE_DIR + 
-				Environment.getProperty(Environment.PROPERTY_FILE_SEPARATOR) + ".metadata" + 
-				Environment.getProperty(Environment.PROPERTY_FILE_SEPARATOR) + "templates" + 
-				Environment.getProperty(Environment.PROPERTY_FILE_SEPARATOR) + "RWT";
+				Session.FileSeparator() + ".metadata" + 
+				Session.FileSeparator() + "templates" + 
+				Session.FileSeparator() + "RWT";
 		
 		// The Project type templates description file
-		public static final String PROJECT_TYPES_FILE_PATH = PLUGIN_WORKSPACE_DIR + Environment.getProperty(Environment.PROPERTY_FILE_SEPARATOR) + "index.json";
+		public static final String PROJECT_TYPES_FILE_PATH = PLUGIN_WORKSPACE_DIR + Session.FileSeparator() + "index.json";
 		
 		// The shared instance
 		private static Activator plugin;
@@ -151,20 +152,20 @@ public class Activator extends AbstractUIPlugin {
 					.replaceAll("#SELECTED_PROJECT_NAME#", Activator.getSelectedProjectName())
 					.replaceAll("#SELECTED_PROJECT_WORKSPACE_PATH#", Activator.getSelectedProjectWorkspacePath())
 					.replaceAll("#SELECTED_PROJECT_PHYSICAL_PATH#", Activator.getSelectedProjectPhysicalPath())
-					.replaceAll("#PROPERTY_FILE_SEPARATOR#", Environment.getProperty(Environment.PROPERTY_FILE_SEPARATOR))
-					.replaceAll("#PROPERTY_JAVA_CLASS_PATH#", Environment.getProperty(Environment.PROPERTY_JAVA_CLASS_PATH))
-					.replaceAll("#PROPERTY_JAVA_HOME#", Environment.getProperty(Environment.PROPERTY_JAVA_HOME))
-					.replaceAll("#PROPERTY_JAVA_VENDOR#", Environment.getProperty(Environment.PROPERTY_JAVA_VENDOR))
-					.replaceAll("#PROPERTY_JAVA_VENDOR_URL#", Environment.getProperty(Environment.PROPERTY_JAVA_VENDOR_URL))
-					.replaceAll("#PROPERTY_JAVA_VERSION#", Environment.getProperty(Environment.PROPERTY_JAVA_VERSION))
-					.replaceAll("#PROPERTY_LINE_SEPARATOR#", Environment.getProperty(Environment.PROPERTY_LINE_SEPARATOR))
-					.replaceAll("#PROPERTY_OS_ARCH#", Environment.getProperty(Environment.PROPERTY_OS_ARCH))
-					.replaceAll("#PROPERTY_OS_NAME#", Environment.getProperty(Environment.PROPERTY_OS_NAME))
-					.replaceAll("#PROPERTY_OS_VERSION#", Environment.getProperty(Environment.PROPERTY_OS_VERSION))
-					.replaceAll("#PROPERTY_PATH_SEPARATOR#", Environment.getProperty(Environment.PROPERTY_PATH_SEPARATOR))
-					.replaceAll("#PROPERTY_USER_DIR#", Environment.getProperty(Environment.PROPERTY_USER_DIR))
-					.replaceAll("#PROPERTY_USER_HOME#", Environment.getProperty(Environment.PROPERTY_USER_HOME))
-					.replaceAll("#PROPERTY_USER_NAME#", Environment.getProperty(Environment.PROPERTY_USER_NAME));
+					.replaceAll("#PROPERTY_FILE_SEPARATOR#", Session.FileSeparator())
+					.replaceAll("#PROPERTY_JAVA_CLASS_PATH#", Session.JavaClassPath())
+					.replaceAll("#PROPERTY_JAVA_HOME#", Session.JavaHome())
+					.replaceAll("#PROPERTY_JAVA_VENDOR#", Session.JavaVendor())
+					.replaceAll("#PROPERTY_JAVA_VENDOR_URL#", Session.JavaVendorURL())
+					.replaceAll("#PROPERTY_JAVA_VERSION#", Session.JavaVersion())
+					.replaceAll("#PROPERTY_LINE_SEPARATOR#", Session.LineSeparator())
+					.replaceAll("#PROPERTY_OS_ARCH#", Session.OperatingSystemArchitecture())
+					.replaceAll("#PROPERTY_OS_NAME#", Session.OperatingSystemName())
+					.replaceAll("#PROPERTY_OS_VERSION#", Session.OperatingSystemVersion())
+					.replaceAll("#PROPERTY_PATH_SEPARATOR#", Session.PathSeparator())
+					.replaceAll("#PROPERTY_USER_DIR#", Session.UserDirectory())
+					.replaceAll("#PROPERTY_USER_HOME#", Session.UserHome())
+					.replaceAll("#PROPERTY_USER_NAME#", Session.UserName());
 		}
 
 	public static String getSelectionPackage(Object selection) {

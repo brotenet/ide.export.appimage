@@ -15,6 +15,8 @@ import org.apache.tools.ant.ProjectHelper;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.environment.Environment;
+import org.eclipse.swt.environment.Environment.FileSystem;
+import org.eclipse.swt.environment.Environment.Session;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -41,14 +43,15 @@ public class ExportAppImageComposite extends Composite {
 	private Text txtFileName;
 	private Text txtTargetDir;
 	private Text log;
+	private Text txtMainClassPath;
 	
 	public ExportAppImageComposite(Composite parent) {
 		super(parent, SWT.NONE);
 		project_information = Activator.getProjectInformation();
-		deployment_dir = project_information.getString("project_full_path") + Environment.getProperty(Environment.PROPERTY_FILE_SEPARATOR) + "deploy";
+		deployment_dir = project_information.getString("project_full_path") + Session.FileSeparator() + "deploy";
 		build_file_data = Environment.Resources.getStringFromResource("/ide/export/appimage/build.xml");
-		build_file_path = project_information.getString("project_full_path") + Environment.getProperty(Environment.PROPERTY_FILE_SEPARATOR) + "build.xml";
-		appimage_assets_prefix = project_information.getString("project_full_path") + Environment.getProperty(Environment.PROPERTY_FILE_SEPARATOR);
+		build_file_path = project_information.getString("project_full_path") + Session.FileSeparator() + "build.xml";
+		appimage_assets_prefix = project_information.getString("project_full_path") + Session.FileSeparator();
 		if(project_information.has("properties")) {
 			if(project_information.getJSONObject("properties").has("projectDescription")) {
 				if(project_information.getJSONObject("properties").getJSONObject("projectDescription").has("name")) {
@@ -62,7 +65,7 @@ public class ExportAppImageComposite extends Composite {
 		setLayout(new GridLayout(4, false));
 		
 		CLabel lblNewLabel = new CLabel(this, SWT.NONE);
-		lblNewLabel.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 3));
+		lblNewLabel.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 4));
 		lblNewLabel.setImage(new Image(null, ExportAppImageComposite.class.getResourceAsStream("/ide/export/appimage/appimage-big.png")));
 		lblNewLabel.setText("");
 		
@@ -96,6 +99,15 @@ public class ExportAppImageComposite extends Composite {
 			}
 		});
 		btnBrowse.setText("Browse");
+		
+		CLabel lblNewLabel_3 = new CLabel(this, SWT.NONE);
+		lblNewLabel_3.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblNewLabel_3.setText("Main Class:");
+		
+		txtMainClassPath = new Text(this, SWT.BORDER | SWT.RIGHT);
+		txtMainClassPath.setText("application.Main");
+		txtMainClassPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		new Label(this, SWT.NONE);
 		new Label(this, SWT.NONE);
 		
 		Button txtKeepBuildFile = new Button(this, SWT.CHECK);
@@ -109,7 +121,7 @@ public class ExportAppImageComposite extends Composite {
 		group.setLayout(new GridLayout(1, false));
 		
 		log = new Text(group, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
-		log.setText("The application will be packaged with the following dependencies:" + Environment.getProperty(Environment.PROPERTY_LINE_SEPARATOR) + project_information.getJSONArray("libraries").toString(1));
+		log.setText("The application will be packaged with the following dependencies:" + Session.LineSeparator() + project_information.getJSONArray("libraries").toString(1));
 		log.setEditable(false);
 		log.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		
@@ -139,7 +151,7 @@ public class ExportAppImageComposite extends Composite {
 				if(txtFileName.getText().trim().length() < 1 || txtTargetDir.getText().trim().length() < 1) {
 					MessageBox message = new MessageBox(getShell(), SWT.ICON_WARNING);
 					message.setText("Invalid Input");
-					message.setMessage("'Archive Name' and/or 'Output Directory' are invalid." + Environment.getProperty(Environment.PROPERTY_LINE_SEPARATOR) + "Please review before build.");
+					message.setMessage("'Archive Name' and/or 'Output Directory' are invalid." + Session.LineSeparator() + "Please review before build.");
 					message.open();
 				}else {
 					if(completed == false) {
@@ -153,12 +165,12 @@ public class ExportAppImageComposite extends Composite {
 							build_file_data = build_file_data.replace("#OUTPUT_DIR#", txtTargetDir.getText().trim());
 							build_file_data = build_file_data.replace("#BIN_DIR#", getBinDir(project_information));
 							build_file_data = build_file_data.replace("#SRC_DIR#", getSrcDir(project_information));
-							log.setText(log.getText() + Environment.getProperty(Environment.PROPERTY_LINE_SEPARATOR) + "Preparing build project...");
+							log.setText(log.getText() + Session.LineSeparator() + "Preparing build project...");
 							Project project = new Project();
-							log.setText(log.getText() + Environment.getProperty(Environment.PROPERTY_LINE_SEPARATOR) + "Creating build file...");
+							log.setText(log.getText() + Session.LineSeparator() + "Creating build file...");
 							Environment.FileSystem.delete(build_file_path);
 							Environment.FileSystem.touch(build_file_path, build_file_data);
-							log.setText(log.getText() + Environment.getProperty(Environment.PROPERTY_LINE_SEPARATOR) + "Extracting AppImage assets...");
+							log.setText(log.getText() + Session.LineSeparator() + "Extracting AppImage assets...");
 							createFileFromResource("/ide/export/appimage/.Diricon", appimage_assets_prefix + ".Diricon");
 							openFilesystemPermissions( appimage_assets_prefix + ".Diricon");
 							createFileFromResource("/ide/export/appimage/appimagetool-x86_64.AppImage", appimage_assets_prefix + "appimagetool-x86_64.AppImage");
@@ -169,20 +181,22 @@ public class ExportAppImageComposite extends Composite {
 							createFileFromResource("/ide/export/appimage/AppRun-x86_64", appimage_assets_prefix + "AppRun-x86_64");
 							openFilesystemPermissions(appimage_assets_prefix + "AppRun-x86_64");
 							createFileFromResource("/ide/export/appimage/run", appimage_assets_prefix + "run");
-							openFilesystemPermissions(appimage_assets_prefix + "run");					
-							log.setText(log.getText() + Environment.getProperty(Environment.PROPERTY_LINE_SEPARATOR) + "Loading build file...");
+							openFilesystemPermissions(appimage_assets_prefix + "run");
+							createMainfestFile(project_information, txtMainClassPath.getText().trim(), appimage_assets_prefix + "MANIFEST.MF");
+							openFilesystemPermissions(appimage_assets_prefix + "MANIFEST.MF");
+							log.setText(log.getText() + Session.LineSeparator() + "Loading build file...");
 							project.setUserProperty("ant.file", build_file_path);
 							project.init();
-							log.setText(log.getText() + Environment.getProperty(Environment.PROPERTY_LINE_SEPARATOR) + "Creating build helper...");
+							log.setText(log.getText() + Session.LineSeparator() + "Creating build helper...");
 							ProjectHelper helper = ProjectHelper.getProjectHelper();
 							project.addReference("ant.projectHelper", helper);
 							helper.parse(project, new File(build_file_path));
-							log.setText(log.getText() + Environment.getProperty(Environment.PROPERTY_LINE_SEPARATOR) + "Building AppImage package...");
+							log.setText(log.getText() + Session.LineSeparator() + "Building AppImage package...");
 							project.executeTarget(project.getDefaultTarget());
 							if(txtKeepBuildFile.getSelection() == false) {
 								Environment.FileSystem.delete(build_file_path);
 							}else {
-								Environment.FileSystem.copy(build_file_path, txtTargetDir.getText().trim() + Environment.getProperty(Environment.PROPERTY_FILE_SEPARATOR) + "build.xml");
+								Environment.FileSystem.copy(build_file_path, txtTargetDir.getText().trim() + Session.FileSeparator() + "build.xml");
 							}
 							completed = true;
 							btnBuild.setText("Close");
@@ -204,6 +218,22 @@ public class ExportAppImageComposite extends Composite {
 		btnBuild.setImage(new Image(null, ExportAppImageComposite.class.getResourceAsStream("/ide/export/appimage/package.png")));
 	}
 	
+	private static String createMainfestFile(JSONObject project_information, String main_class_path, String tagret_file_path) throws IOException {
+		String output = "Manifest-Version: 1.0\nClass-Path: . ";
+		for(JSONObject classpath_entry : project_information.getJSONObject("classpath").getJSONArray("classpathentry").toArray(JSONObject.class)) {
+			if(classpath_entry.has("kind")) {
+				if(classpath_entry.getString("kind").equalsIgnoreCase("lib")) {
+					String lib_filename = classpath_entry.getString("path");
+					lib_filename = lib_filename.split("/")[lib_filename.split("/").length - 1];
+					output = output + "lib/" + lib_filename + " ";
+				}
+			}
+		}
+		output = output + "\nMain-Class: " + main_class_path + "\n";
+		FileSystem.touch(tagret_file_path, output);
+		return output;
+	}
+	
 	private static String getClassPathEntries(JSONObject project_information) {
 		String output = "";
 		for(JSONObject classpath_entry : project_information.getJSONObject("classpath").getJSONArray("classpathentry").toArray(JSONObject.class)) {
@@ -211,7 +241,7 @@ public class ExportAppImageComposite extends Composite {
 				if(classpath_entry.getString("kind").equalsIgnoreCase("lib")) {
 					String lib_filename = classpath_entry.getString("path");
 					lib_filename = lib_filename.split("/")[lib_filename.split("/").length - 1];
-					output = output + "<pathelement location=\"${lib_dir}/" + lib_filename + "\" />" + Environment.getProperty(Environment.PROPERTY_LINE_SEPARATOR);
+					output = output + "<pathelement location=\"${lib_dir}/" + lib_filename + "\" />" + Session.LineSeparator();
 				}
 			}
 		}
@@ -223,7 +253,7 @@ public class ExportAppImageComposite extends Composite {
 		for(JSONObject classpath_entry : project_information.getJSONObject("classpath").getJSONArray("classpathentry").toArray(JSONObject.class)) {
 			if(classpath_entry.has("kind")) {
 				if(classpath_entry.getString("kind").equalsIgnoreCase("lib")) {
-					output = output + "<copy file=\"" +  classpath_entry.getString("path") + "\" todir=\"${appimage_dir}/usr/bin/${lib_dir}\" />" + Environment.getProperty(Environment.PROPERTY_LINE_SEPARATOR);
+					output = output + "<copy file=\"" +  classpath_entry.getString("path") + "\" todir=\"${appimage_dir}/usr/bin/${lib_dir}\" />" + Session.LineSeparator();
 				}
 			}
 		}

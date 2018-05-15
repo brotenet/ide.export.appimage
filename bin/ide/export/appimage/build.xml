@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="compile">
+	<property name="project_path" value="#PROJECT_PATH#" />
+	<property name="package_name" value="#PACKAGE_NAME#" />
+	<property name="output_dir" value="#OUTPUT_DIR#" />
+	<property name="appimage_dir" value="appimage" />
+	<property name="bin_dir" value="#BIN_DIR#" />
+	<property name="jar_dir" value="jar" />
+	<property name="lib_dir" value="lib" />
+	<property name="src_dir" value="#SRC_DIR#" />
+	<target name="compile">
+		<mkdir dir="${bin_dir}" />
+		<javac fork="true" srcdir="${src_dir}" destdir="${bin_dir}">
+			<classpath>
+				<ESC>#CLASSPATH_ENTRIES#</ESC>
+			</classpath>
+		</javac>
+		<mkdir dir="${appimage_dir}/usr/bin/${lib_dir}" />
+		<ESC>#PROJECT_LIBRARIES#</ESC>
+		<copy todir="${bin_dir}">
+			<fileset dir="${src_dir}">
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+		<copy todir="${appimage_dir}/usr/bin">
+			<fileset dir=".">
+				<exclude name=".project" />
+				<exclude name=".classpath" />
+				<exclude name=".Diricon" />
+				<exclude name="application.png" />
+				<exclude name="AppRun-x86_64" />
+				<exclude name="build.xml" />
+				<exclude name="run" />
+				<exclude name="appimagetool-x86_64.AppImage" />
+				<exclude name="application.desktop" />
+				<exclude name="**/.settings/**" />
+				<exclude name="**/${bin_dir}/**" />
+				<exclude name="**/${jar_dir}/**" />
+				<exclude name="**/${lib_dir}/**" />
+				<exclude name="**/${src_dir}/**" />
+				<exclude name="**/${appimage_dir}/**" />
+			</fileset>
+		</copy>
+		<mkdir dir="${jar_dir}/META-INF" />
+		<copy file="MANIFEST.MF" todir="${jar_dir}/META-INF" />
+		<zip destfile="${package_name}.jar">
+			<fileset dir="${bin_dir}" />
+			<fileset dir="${jar_dir}" />
+		</zip>
+		<mkdir dir="${appimage_dir}" />
+		<mkdir dir="${appimage_dir}/usr/bin" />
+		<copy file="${package_name}.jar" todir="${appimage_dir}/usr/bin" />
+		<replace file="run" token="@PACKAGE_NAME@" value="${package_name}" />
+		<copy file="run" todir="${appimage_dir}/usr/bin" />
+		<replace file="application.desktop" token="@PACKAGE_NAME@" value="${package_name}" />
+		<copy file="application.desktop" todir="${appimage_dir}" />
+		<copy file="application.png" tofile="${appimage_dir}/${package_name}.png" />
+		<replace file=".Diricon" token="@PACKAGE_NAME@" value="${package_name}" />
+		<copy file=".Diricon" todir="${appimage_dir}" />
+		<copy file="AppRun-x86_64" tofile="${appimage_dir}/AppRun" />
+		<exec executable="/bin/bash">
+			<arg value="-c" />
+			<arg value="export ARCH=x86_64; pwd; echo $ARCH" />
+		</exec>
+		<exec executable="/bin/bash">
+			<arg value="-c" />
+			<arg value="chmod -Rv 777 ${appimage_dir}" />
+		</exec>
+		<exec executable="/bin/bash">
+			<arg value="-c" />
+			<arg value="chmod -Rv 777 appimagetool-x86_64.AppImage" />
+		</exec>
+		<exec executable="${project_path}/appimagetool-x86_64.AppImage">
+			<arg value="-n" />
+			<arg value="${appimage_dir}" />
+			<arg value="${package_name}.appimage" />
+		</exec>
+		<move file="${package_name}.appimage" todir="${output_dir}" />
+		<delete dir="bin" />
+		<delete dir="jar" />
+		<delete dir="appimage" />
+		<delete file="${package_name}.jar" />
+		<delete file="appimagetool-x86_64.AppImage" />
+		<delete file="run" />
+		<delete file="application.desktop" />
+		<delete file="application.png" />
+		<delete file="AppRun-x86_64" />
+		<delete file=".Diricon" />
+	</target>
+</project>
